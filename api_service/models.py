@@ -14,7 +14,9 @@ class Question(models.Model):
 
 class Option(models.Model):
     text = models.CharField(max_length=200)
-    question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        Question, related_name="options", on_delete=models.CASCADE
+    )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

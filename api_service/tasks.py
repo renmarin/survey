@@ -14,4 +14,6 @@ def sent_email_to_admin(subject, message, sender, receivers):
     except:
         logger.info(f"Need real data for sender and receiver(s)")
         logger.info(f"Data used in test:")
-        logger.info(f"subject: {subject}, message: {message}, sender: {sender}, receiver: {receivers}")
+        logger.info(
+            f"subject: {subject}, message: {message}, sender: {sender}, receiver: {receivers}"
+        )
