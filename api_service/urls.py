@@ -21,7 +21,7 @@ schema_view = get_schema_view(
 app_name = "api_service"
 
 urlpatterns = [
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('questions/', views.QuestionsList.as_view()),
     path('questions/<int:pk>/', views.QuestionDetail.as_view()),
     path('questions/<int:pk>/options/', views.OptionsList.as_view()),
