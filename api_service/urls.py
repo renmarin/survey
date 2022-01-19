@@ -11,7 +11,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="Survey API",
-        default_version="v1.2",
+        default_version="v1.3",
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -28,6 +28,6 @@ urlpatterns = [
         "questions/<int:question_pk>/options/<int:option_pk>/",
         views.OptionDetail.as_view(),
     ),
-    path('users/', views.UserList.as_view()),
-    path('users/<int:pk>/', views.UserDetail.as_view()),
+    path("users/", views.UserList.as_view()),
+    path("users/<int:pk>/", views.UserDetail.as_view()),
 ]

@@ -7,7 +7,7 @@ class Question(models.Model):
     description = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, related_name='questions', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name="questions", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.text
@@ -20,7 +20,9 @@ class Option(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, related_name='options', on_delete=models.CASCADE, default=1)
+    author = models.ForeignKey(
+        User, related_name="options", on_delete=models.CASCADE, default=1
+    )
 
     def __str__(self):
         return self.text

@@ -4,12 +4,16 @@ from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    questions = serializers.PrimaryKeyRelatedField(many=True, queryset=Question.objects.all())
-    options = serializers.PrimaryKeyRelatedField(many=True, queryset=Option.objects.all())
+    questions = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Question.objects.all()
+    )
+    options = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Option.objects.all()
+    )
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'questions', 'options']
+        fields = ["id", "username", "questions", "options"]
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -17,7 +21,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     options = serializers.SlugRelatedField(
         many=True, queryset=Option.objects.all(), slug_field="text", required=False
     )
-    author_username = serializers.ReadOnlyField(source='author.username')
+    author_username = serializers.ReadOnlyField(source="author.username")
 
     class Meta:
         model = Question
@@ -52,7 +56,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class OptionSerializer(serializers.ModelSerializer):
 
-    author_username = serializers.ReadOnlyField(source='author.username')
+    author_username = serializers.ReadOnlyField(source="author.username")
 
     class Meta:
         model = Option

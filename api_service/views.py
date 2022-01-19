@@ -8,7 +8,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsAuthorOrReadOnly, IsOwnerParent
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -37,7 +37,7 @@ class QuestionsList(APIView):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get(self, request, format=None):
+    def get(self, request):
         questions = Question.objects.all()
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data)
@@ -45,11 +45,12 @@ class QuestionsList(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, properties=properties)
     )
-    def post(self, request, format=None):
-        request.data['author'] = request.user.id
+    def post(self, request):
+        request.data["author"] = request.user.id
         serializer = QuestionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+
             # send email to admin (admarin) when creating a new question
             sent_email_to_admin.delay(
                 "INFO",
@@ -66,10 +67,7 @@ class QuestionDetail(APIView):
     Retrieve, update or delete a Questions instance.
     """
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsAuthorOrReadOnly
-    ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -77,7 +75,7 @@ class QuestionDetail(APIView):
         except Question.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         question = self.get_object(pk)
         serializer = QuestionSerializer(question)
         return Response(serializer.data)
@@ -85,16 +83,16 @@ class QuestionDetail(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, properties=properties)
     )
-    def put(self, request, pk, format=None):
+    def put(self, request, pk):
         question = self.get_object(pk)
-        request.data['author'] = request.user.id
+        request.data["author"] = request.user.id
         serializer = QuestionSerializer(question, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request, pk):
         question = self.get_object(pk)
         question.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -114,9 +112,9 @@ class OptionsList(APIView):
     List all Options, or create a new Options.
     """
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerParent]
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         options = Option.objects.filter(question_id=pk).all()
         serializer = OptionSerializer(options, many=True)
         return Response(serializer.data)
@@ -126,11 +124,11 @@ class OptionsList(APIView):
             type=openapi.TYPE_OBJECT, properties=option_properties
         )
     )
-    def post(self, request, pk, format=None):
-        request.data['author'] = request.user.id
+    def post(self, request, pk):
+        request.data["author"] = request.user.id
         question = Question.objects.get(pk=pk)
         # use entered option id when create option or current question id of none
-        request.data['question'] = request.data.get('question', question.id)
+        request.data["question"] = request.data.get("question", question.id)
         serializer = OptionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -149,10 +147,7 @@ class OptionDetail(APIView):
     Retrieve, update or delete a Options instance.
     """
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsAuthorOrReadOnly
-    ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
     def get_object(self, question_pk, option_pk):
         try:
@@ -160,7 +155,7 @@ class OptionDetail(APIView):
         except Option.DoesNotExist:
             raise Http404
 
-    def get(self, request, question_pk, option_pk, format=None):
+    def get(self, request, question_pk, option_pk):
         option = self.get_object(question_pk, option_pk)
         serializer = OptionSerializer(option)
         return Response(serializer.data)
@@ -170,11 +165,11 @@ class OptionDetail(APIView):
             type=openapi.TYPE_OBJECT, properties=option_properties
         )
     )
-    def put(self, request, question_pk, option_pk, format=None):
+    def put(self, request, question_pk, option_pk):
         question = Question.objects.get(pk=question_pk)
         # use entered option id when create option or current question id of none
-        request.data['question'] = request.data.get('question', question.id)
-        request.data['author'] = request.user.id
+        request.data["question"] = request.data.get("question", question.id)
+        request.data["author"] = request.user.id
         option = self.get_object(question_pk, option_pk)
         serializer = OptionSerializer(option, data=request.data)
         if serializer.is_valid():
@@ -182,7 +177,7 @@ class OptionDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, question_pk, option_pk, format=None):
+    def delete(self, request, question_pk, option_pk):
         option = self.get_object(question_pk, option_pk)
         option.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
