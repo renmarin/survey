@@ -1,6 +1,6 @@
-"""SWAGGER done poorly. Do not use {format} options, they are fake and no use.
+"""SWAGGER done poorly. Better only use as documentary.
 PUT as update works fine. POST as create works fine.
-(Not user friendly, better use DRF native interface)
+(Not user friendly, better use DRF native interface for working)
 DELETE options are perfectly fine"""
 
 from .models import Question, Option
@@ -58,13 +58,14 @@ class QuestionsList(APIView):
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, properties=properties)
     )
     def post(self, request, format=None):
+        request.data['author'] = request.user.id
         serializer = QuestionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             # send email to admin (admarin) when creating a new question
             sent_email_to_admin.delay(
                 "INFO",
-                "New Question Created",
+                f"New Question: \"{request.data.get('text')}\" is created by {request.user} user",
                 "server@example.com",
                 ["admarin@example.com"],
             )
@@ -98,6 +99,7 @@ class QuestionDetail(APIView):
     )
     def put(self, request, pk, format=None):
         question = self.get_object(pk)
+        request.data['author'] = request.user.id
         serializer = QuestionSerializer(question, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -140,12 +142,16 @@ class OptionsList(APIView):
         )
     )
     def post(self, request, pk, format=None):
+        request.data['author'] = request.user.id
+        question = Question.objects.get(pk=pk)
+        # use entered option id when create option or current question id of none
+        request.data['question'] = request.data.get('question', question.id)
         serializer = OptionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             sent_email_to_admin.delay(
                 "INFO",
-                "New Option Created",
+                f"New Option: \"{request.data.get('text')}\" is created by {request.user} user",
                 "server@example.com",
                 ["admarin@example.com"],
             )
@@ -180,6 +186,10 @@ class OptionDetail(APIView):
         )
     )
     def put(self, request, question_pk, option_pk, format=None):
+        question = Question.objects.get(pk=question_pk)
+        # use entered option id when create option or current question id of none
+        request.data['question'] = request.data.get('question', question.id)
+        request.data['author'] = request.user.id
         option = self.get_object(question_pk, option_pk)
         serializer = OptionSerializer(option, data=request.data)
         if serializer.is_valid():

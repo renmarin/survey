@@ -11,8 +11,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="Survey API",
-        default_version="v1",
-        description="Test description",
+        default_version="v1.2",
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

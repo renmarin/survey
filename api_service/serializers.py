@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
 
     options = serializers.SlugRelatedField(
-        many=True, queryset=Option.objects.all(), slug_field="text"
+        many=True, queryset=Option.objects.all(), slug_field="text", required=False
     )
     author_username = serializers.ReadOnlyField(source='author.username')
 
@@ -71,6 +71,7 @@ class OptionSerializer(serializers.ModelSerializer):
         option = Option(
             text=validated_data["text"],
             question=validated_data["question"],
+            author=validated_data["author"],
         )
         option.save()
         return option
