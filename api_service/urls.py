@@ -29,6 +29,8 @@ urlpatterns = [
         "questions/<int:question_pk>/options/<int:option_pk>/",
         views.OptionDetail.as_view(),
     ),
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

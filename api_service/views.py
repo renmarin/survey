@@ -4,11 +4,16 @@ PUT as update works fine. POST as create works fine.
 DELETE options are perfectly fine"""
 
 from .models import Question, Option
-from .serializers import QuestionSerializer, OptionSerializer
+from .serializers import QuestionSerializer, OptionSerializer, UserSerializer
 from django.http import Http404
+from django.contrib.auth.models import User
+
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import permissions
+from .permissions import IsAuthorOrReadOnly
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -42,6 +47,8 @@ class QuestionsList(APIView):
     List all Questions, or create a new Questions.
     """
 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request, format=None):
         questions = Question.objects.all()
         serializer = QuestionSerializer(questions, many=True)
@@ -69,6 +76,11 @@ class QuestionDetail(APIView):
     """
     Retrieve, update or delete a Questions instance.
     """
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrReadOnly
+    ]
 
     def get_object(self, pk):
         try:
@@ -115,6 +127,8 @@ class OptionsList(APIView):
     List all Options, or create a new Options.
     """
 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request, pk, format=None):
         options = Option.objects.filter(question_id=pk).all()
         serializer = OptionSerializer(options, many=True)
@@ -144,6 +158,11 @@ class OptionDetail(APIView):
     Retrieve, update or delete a Options instance.
     """
 
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrReadOnly
+    ]
+
     def get_object(self, question_pk, option_pk):
         try:
             return Option.objects.filter(question_id=question_pk).get(pk=option_pk)
@@ -172,3 +191,13 @@ class OptionDetail(APIView):
         option = self.get_object(question_pk, option_pk)
         option.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

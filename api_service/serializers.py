@@ -1,5 +1,15 @@
 from rest_framework import serializers
 from .models import Question, Option
+from django.contrib.auth.models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    questions = serializers.PrimaryKeyRelatedField(many=True, queryset=Question.objects.all())
+    options = serializers.PrimaryKeyRelatedField(many=True, queryset=Option.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'questions', 'options']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -7,6 +17,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     options = serializers.SlugRelatedField(
         many=True, queryset=Option.objects.all(), slug_field="text"
     )
+    author_username = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
         model = Question
@@ -17,6 +28,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "created",
             "modified",
             "author",
+            "author_username",
             "options",
         ]
 
@@ -39,9 +51,21 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class OptionSerializer(serializers.ModelSerializer):
+
+    author_username = serializers.ReadOnlyField(source='author.username')
+
     class Meta:
         model = Option
-        fields = "__all__"
+        fields = [
+            "id",
+            "text",
+            "question",
+            "created",
+            "modified",
+            "author",
+            "author",
+            "author_username",
+        ]
 
     def create(self, validated_data):
         option = Option(
