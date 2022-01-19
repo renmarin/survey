@@ -1,8 +1,3 @@
-"""SWAGGER done poorly. Better only use as documentary.
-PUT as update works fine. POST as create works fine.
-(Not user friendly, better use DRF native interface for working)
-DELETE options are perfectly fine"""
-
 from .models import Question, Option
 from .serializers import QuestionSerializer, OptionSerializer, UserSerializer
 from django.http import Http404
@@ -31,13 +26,6 @@ properties = {
         type=openapi.TYPE_STRING,
         description="some additional description",
         default="description",
-    ),
-    "author": openapi.Schema(
-        type=openapi.TYPE_STRING, description="author name", default="admarin"
-    ),
-    "options": openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        description="options for question (not edible in question creation)",
     ),
 }
 
@@ -117,10 +105,7 @@ option_properties = {
         type=openapi.TYPE_STRING,
         description="Text of the question",
         default="question[num]",
-    ),
-    "question": openapi.Schema(
-        type=openapi.TYPE_INTEGER, description="ID of Question", default=1
-    ),
+    )
 }
 
 
