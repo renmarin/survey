@@ -19,14 +19,36 @@ You need **redis-server** in order to use **Celery** for sending emails to admin
 2. /questions/
   - GET(READ) - list of all questions with options
   - POST(CREATE) - create new question
+  ```
+    {
+        "text": "Question name",
+        "description": "description"
+    }
+  ```
 3. /questions/<int:id>/
   - GET(READ) - detail information of question
   - PUT(UPDATE) - update information of question
+  ```
+    {
+        "text": "Question name",
+        "description": "description"
+    }
+  ```
   - DELETE - delete question
 4. /questions/<int:id>/options/
   - GET(READ) - list of all options for question
   - POST(CREATE) - create new option for question
+  ```
+    {
+        "text": "Option 14 - 1"
+    }
+  ```
 5. /questions/<int:id>/options/<int:id>/
   - GET(READ) - detail information of option
   - PUT(UPDATE) - update information of option
+  ```
+      {
+        "text": "Option 14 - 3-changed"
+    }
+  ```
   - DELETE - delete option
